@@ -1,0 +1,36 @@
+diff -u -r ../gmp-2012.09.orig/tests/misc/t-scanf.c ./tests/misc/t-scanf.c
+--- ../gmp-2012.09.orig/tests/misc/t-scanf.c	2013-01-07 05:05:15.478577592 -0800
++++ ./tests/misc/t-scanf.c	2013-01-07 05:08:37.310581625 -0800
+@@ -93,6 +93,24 @@
+   return result;
+ }
+ 
++/* This is a problem found on i686-pc-mingw32, running binaries under
++   Wine.  Windows scanf functions don't skip whitespace before %-specifiers
++   [http://msdn.microsoft.com/en-us/library/kwwtf9ch(VS.71).aspx] */
++/* http://gmplib.org/list-archives/gmp-devel/2009-January/000817.html */
++int
++test_sscanf_s_skips_whitespace (void)
++{
++  char str[16];
++
++  if (sscanf (" ", "%s", str) == EOF)
++    return 1;
++  else
++    {
++      printf ("Warning, sscanf (\" \", \"%s\", str) != EOF.\n");
++      printf ("This affects gmp_sscanf, some tests will be suppressed.\n");
++      return 0;
++    }
++}
+ 
+ /* Convert fmt from a GMP scanf format string to an equivalent for a plain
+    libc scanf, for example "%Zd" becomes "%ld".  Return 1 if this succeeds,
+@@ -1489,6 +1507,7 @@
+   }
+ 
+   /* EOF for no matching */
++  if (test_sscanf_s_skips_whitespace ())
+   {
+     char buf[128];
+     ret = gmp_sscanf ("   ", "%s", buf);

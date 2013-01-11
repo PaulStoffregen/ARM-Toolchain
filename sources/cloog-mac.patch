@@ -1,0 +1,11 @@
+--- configure.orig	2013-01-04 17:43:57.000000000 -0800
++++ configure	2013-01-04 17:42:53.000000000 -0800
+@@ -11241,6 +11241,8 @@
+ 	LIBS="$LIBS -lppl_c -lppl -lgmpxx -lstdc++"
+ 	if test x$host_alias = xi686-darwin8; then
+ 	    LIBS="$LIBS -lgcc_s.10.4"
++	elif test x$build_vendor = xapple; then
++	    LIBS="$LIBS -lgcc_s.10.4"
+ 	elif test x$host_alias != xi686-mingw32; then
+ 	    LIBS="$LIBS -lgcc_s"
+ 	fi

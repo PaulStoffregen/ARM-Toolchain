@@ -1,0 +1,20 @@
+--- configure.orig	2013-01-08 04:04:29.680231302 -0800
++++ configure	2013-01-08 04:03:20.952229904 -0800
+@@ -4922,7 +4922,7 @@
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ld used by GCC" >&5
+ $as_echo_n "checking for ld used by GCC... " >&6; }
+   case $host in
+-  *-*-mingw*)
++  *-*-mingw* | *-mingw32msvc)
+     # gcc leaves a trailing carriage return which upsets mingw
+     ac_prog=`($CC -print-prog-name=ld) 2>&5 | tr -d '\015'` ;;
+   *)
+@@ -9188,7 +9188,7 @@
+ 
+ 
+ case "$host" in
+-  *-*-mingw32)
++  *-*-mingw32 | *-mingw32msvc)
+      if true; then
+   WINDOWSENV_TRUE=
+   WINDOWSENV_FALSE='#'

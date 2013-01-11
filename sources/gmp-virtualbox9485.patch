@@ -1,0 +1,63 @@
+diff -r -u ../gmp-2012.09.orig/tests/misc/t-scanf.c ./tests/misc/t-scanf.c
+--- ../gmp-2012.09.orig/tests/misc/t-scanf.c	2012-10-30 10:24:42.000000000 -0700
++++ ./tests/misc/t-scanf.c	2013-01-09 01:47:39.045793772 -0800
+@@ -149,6 +167,7 @@
+   fmt = va_arg (ap, const char *);
+ #endif
+ 
++  remove(TEMPFILE); /* workaround for vitualbox bug 9485 */
+   fp = fopen (TEMPFILE, "w+");
+   ASSERT_ALWAYS (fp != NULL);
+   ASSERT_ALWAYS (fputs (input, fp) != EOF);
+@@ -192,6 +211,7 @@
+   FILE  *fp;
+   int   ret;
+ 
++  remove(TEMPFILE); /* workaround for vitualbox bug 9485 */
+   fp = fopen (TEMPFILE, "w+");
+   ASSERT_ALWAYS (fp != NULL);
+   ASSERT_ALWAYS (fputs (input, fp) != EOF);
+diff -r -u ../gmp-2012.09.orig/tests/mpf/t-inp_str.c ./tests/mpf/t-inp_str.c
+--- ../gmp-2012.09.orig/tests/mpf/t-inp_str.c	2012-10-30 10:24:41.000000000 -0700
++++ ./tests/mpf/t-inp_str.c	2013-01-09 01:43:35.805788911 -0800
+@@ -94,6 +94,7 @@
+ 
+               /* create the file new each time to ensure its length is what
+                  we want */
++              remove(FILENAME); /* workaround for vitualbox bug 9485 */
+               fp = fopen (FILENAME, "w+");
+               ASSERT_ALWAYS (fp != NULL);
+               for (j = 0; j < pre; j++)
+diff -r -u ../gmp-2012.09.orig/tests/mpq/t-inp_str.c ./tests/mpq/t-inp_str.c
+--- ../gmp-2012.09.orig/tests/mpq/t-inp_str.c	2012-10-30 10:24:41.000000000 -0700
++++ ./tests/mpq/t-inp_str.c	2013-01-09 01:40:14.157784883 -0800
+@@ -90,6 +90,7 @@
+ 	  mpq_set_str_or_abort (want, data[i].want, 0);
+ 	  MPQ_CHECK_FORMAT (want);
+ 
++          remove(FILENAME); /* workaround for vitualbox bug 9485 */
+ 	  fp = fopen (FILENAME, "w+");
+ 	  ASSERT_ALWAYS (fp != NULL);
+ 	  fputs (data[i].inp, fp);
+diff -r -u ../gmp-2012.09.orig/tests/mpz/t-inp_str.c ./tests/mpz/t-inp_str.c
+--- ../gmp-2012.09.orig/tests/mpz/t-inp_str.c	2012-10-30 10:24:41.000000000 -0700
++++ ./tests/mpz/t-inp_str.c	2013-01-09 01:38:27.757782757 -0800
+@@ -91,6 +91,7 @@
+ 
+ 	      /* create the file new each time to ensure its length is what
+ 		 we want */
++              remove(FILENAME); /* workaround for vitualbox bug 9485 */
+ 	      fp = fopen (FILENAME, "w+");
+ 	      ASSERT_ALWAYS (fp != NULL);
+ 	      for (j = 0; j < pre; j++)
+diff -r -u ../gmp-2012.09.orig/tests/mpz/t-io_raw.c ./tests/mpz/t-io_raw.c
+--- ../gmp-2012.09.orig/tests/mpz/t-io_raw.c	2012-10-30 10:24:41.000000000 -0700
++++ ./tests/mpz/t-io_raw.c	2013-01-09 01:37:33.949781681 -0800
+@@ -42,6 +42,7 @@
+ fopen_wplusb_or_die (const char *filename)
+ {
+   FILE  *fp;
++  remove(filename); /* workaround for vitualbox bug 9485 */
+   fp = fopen (filename, "w+b");
+   if (fp == NULL)
+     fp = fopen (filename, "w+");

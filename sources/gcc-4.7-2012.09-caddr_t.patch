@@ -1,0 +1,12 @@
+diff -r -u ../gcc-4.7-2012.09.orig/gcc/configure ./gcc/configure
+--- ../gcc-4.7-2012.09.orig/gcc/configure	2013-01-08 11:41:18.212779007 -0800
++++ ./gcc/configure	2013-01-08 11:41:49.396779627 -0800
+@@ -9228,7 +9228,7 @@
+ else
+ 
+ cat >>confdefs.h <<_ACEOF
+-#define caddr_t char *
++//#define caddr_t char *
+ _ACEOF
+ 
+ fi
