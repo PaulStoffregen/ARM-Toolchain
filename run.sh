@@ -4,7 +4,7 @@ OS=LINUX
 #OS=WINDOWS
 #OS=MACOSX
 
-PARALLEL="-j 1"
+PARALLEL="-j 4"
 
 TARGET="arm-none-eabi"
 PKGVERSION="PJRC Build of GNU Toolchain from CodeSourcery"
@@ -139,22 +139,22 @@ export STRIP_FOR_TARGET="${TARGET}-strip"
 
 export PATH="${NATIVE}/bin:${OUTPUT}/bin:${PATH}"
 
-if [ ! -e ${PROGRESS}/${ZLIB}.built ]; then
-	echo "*********************************"
-	echo "   Zlib"
-	echo "*********************************"
-	cd ${WORKD}
-	tar -xjf ${SOURCES}/${ZLIB}.tar.bz2
-	cd ${WORKD}/${ZLIB}
-	export CFLAGS="-O3 -fPIC"
-	./configure --prefix=${STATICLIBS} --static || exit
-	make ${PARALLEL} || exit
-	make install || exit
-	export -n CFLAGS
-	touch ${PROGRESS}/${ZLIB}.built
-	rm -rf ${WORKD}/${ZLIB}
-	cd ${THISDIR}
-fi
+#if [ ! -e ${PROGRESS}/${ZLIB}.built ]; then
+#	echo "*********************************"
+#	echo "   Zlib"
+#	echo "*********************************"
+#	cd ${WORKD}
+#	tar -xjf ${SOURCES}/${ZLIB}.tar.bz2
+#	cd ${WORKD}/${ZLIB}
+#	export CFLAGS="-O3 -fPIC"
+#	./configure --prefix=${STATICLIBS} --static || exit
+#	make ${PARALLEL} || exit
+#	make install || exit
+#	export -n CFLAGS
+#	touch ${PROGRESS}/${ZLIB}.built
+#	rm -rf ${WORKD}/${ZLIB}
+#	cd ${THISDIR}
+#fi
 
 if [ ! -e ${PROGRESS}/${GMP}.built ]; then
 	echo "*********************************"
@@ -166,7 +166,7 @@ if [ ! -e ${PROGRESS}/${GMP}.built ]; then
 	patch -p0 < ${SOURCES}/gmp-virtualbox9485.patch
 	patch -p0 < ${SOURCES}/gmp-tscanf-wine.patch
 	./configure --prefix=${STATICLIBS} --build=${BUILD} --host=${HOST} \
-		--disable-shared --enable-cxx || exit
+		 --disable-shared --enable-cxx || exit
 	make ${PARALLEL} || exit
 	make ${PARALLEL} check || exit
 	make install || exit
@@ -202,7 +202,8 @@ if [ ! -e ${PROGRESS}/${MPC}.built ]; then
 	cd ${WORKD}/${MPC}
 	./configure --prefix=${STATICLIBS} --target=${TARGET} \
 		--build=${BUILD} --host=${HOST} --disable-shared \
-		--disable-nls --with-gmp=${STATICLIBS} --with-mpfr=${STATICLIBS} || exit
+		--disable-nls --with-gmp=${STATICLIBS} \
+		--with-mpfr=${STATICLIBS} || exit
 	make ${PARALLEL} || exit
 	make ${PARALLEL} check || exit
 	make install || exit
@@ -330,6 +331,8 @@ if [ "$OS" != "LINUX" -a ! -e ${PROGRESS}/${MAKE}.built ]; then
 	cd ${THISDIR}
 fi
 
+#		--with-libz=${STATICLIBS} \
+
 if [ ! -e ${PROGRESS}/${BINUTILS}.built ]; then
 	echo "*********************************"
 	echo "   BINUTILS"
@@ -344,7 +347,8 @@ if [ ! -e ${PROGRESS}/${BINUTILS}.built ]; then
 		--build=${BUILD} --host=${HOST} --disable-nls \
         	"--with-pkgversion=${PKGVERSION}" --with-bugurl=${BUGURL} \
 		--with-sysroot=${PREFIX}/${TARGET} \
-        	--enable-poison-system-directories --enable-plugins || exit
+		--without-zlib --disable-shared --enable-static \
+        	--enable-poison-system-directories --disable-plugins || exit
 	make ${PARALLEL} all-libiberty || exit
 	cp -r ${WORKD}/${BINUTILS}/include/* ${STATICLIBS}/include || exit
 	cp ${WORKD}/${BINUTILS}/libiberty/libiberty.a ${STATICLIBS}/lib
@@ -406,7 +410,7 @@ if [ ! -e ${PROGRESS}/${GCC}-extract.built ]; then
 	tar -xjf ${SOURCES}/${GCC}.tar.bz2
 	cp ${SOURCES}/t-cs-eabi-lite ${GCC}/gcc/config/arm
 	cd ${GCC}
-	patch -p0 < ${SOURCES}/gcc-multilib-bash.patch 
+	patch -p0 < ${SOURCES}/gcc-multilib-bash.patch
 	patch -p0 < ${SOURCES}/gcc-4.7-2012.09-caddr_t.patch
 	touch ${PROGRESS}/${GCC}-extract.built
 	cd ${THISDIR}
@@ -425,14 +429,16 @@ if [ ! -e ${PROGRESS}/${GCC}-boot.built -a $BUILD == $HOST ]; then
 		--disable-libstdcxx-pch --enable-extra-sgxxlite-multilibs \
 		--with-gnu-as --with-gnu-ld \
 		'--with-specs=%{save-temps: -fverbose-asm} %{O2:%{!fno-remove-local-statics: -fremove-local-statics}} %{O*:%{O|O0|O1|O2|Os:;:%{!fno-remove-local-statics: -fremove-local-statics}}}' \
-		--disable-shared --enable-lto --with-newlib \
+		--enable-lto --with-newlib \
         	"--with-pkgversion=${PKGVERSION}" --with-bugurl=${BUGURL} \
-		--disable-nls --disable-shared --disable-threads --disable-libssp \
-		--disable-libgomp --without-headers --with-newlib --disable-decimal-float \
-		--disable-libffi --disable-libquadmath --disable-libitm --disable-libatomic \
+		--disable-nls --disable-shared --disable-threads \
+		--disable-libssp --disable-libgomp --without-headers \
+		--with-newlib --disable-decimal-float --disable-libffi \
+		--disable-libquadmath --disable-libitm --disable-libatomic \
 		--enable-languages=c \
 		--with-sysroot=${PREFIX}/${TARGET} \
 		--with-build-sysroot=${OUTPUT}/${TARGET} \
+		--without-libz \
 		--with-gmp=${STATICLIBS} \
 		--with-mpfr=${STATICLIBS} \
 		--with-mpc=${STATICLIBS} \
@@ -480,7 +486,8 @@ if [ ! -e ${PROGRESS}/${NEWLIB}.built -a $BUILD == $HOST ]; then
 		--disable-nls \
 		|| exit
 	make ${PARALLEL}
-	make install prefix=${OUTPUT} exec_prefix=${OUTPUT} libdir=${OUTPUT}/lib \
+	make install prefix=${OUTPUT} exec_prefix=${OUTPUT} \
+		libdir=${OUTPUT}/lib \
 		htmldir=${OUTPUT}/share/doc/arm-arm-none-eabi/html \
 		pdfdir=${OUTPUT}/share/doc/arm-arm-none-eabi/pdf \
 		infodir=${OUTPUT}/share/doc/arm-arm-none-eabi/info \
@@ -526,6 +533,7 @@ if [ ! -e ${PROGRESS}/${GCC}-final.built ]; then
 		--with-headers=yes \
 		--with-sysroot=${PREFIX}/${TARGET} \
 		--with-build-sysroot=${OUTPUT}/${TARGET} \
+		--without-libz \
 		--with-gmp=${STATICLIBS} \
 		--with-mpfr=${STATICLIBS} \
 		--with-mpc=${STATICLIBS} \
