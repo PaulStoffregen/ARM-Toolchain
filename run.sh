@@ -8,6 +8,7 @@ PARALLEL="-j 4"
 
 TARGET="arm-none-eabi"
 PKGVERSION="PJRC Build of GNU Toolchain from CodeSourcery"
+PKGVERSIONGNU="PJRC Build of GNU Toolchain GNU.org"
 BUGURL="http://forum.pjrc.com/"
 
 # programs needed to compile...
@@ -22,7 +23,8 @@ NATIVE=${THISDIR}/native	# native toolchain, used for Canadian cross
 PROGRESS=${THISDIR}/progress	# progress marker files
 STATICLIBS=${THISDIR}/staticlib	# static libraries
 
-BINUTILS="binutils-2012.09"
+#BINUTILS="binutils-2012.09"
+BINUTILS="binutils-2.24"
 CLOOG="cloog-0.15"
 EXPAT="expat-2012.09"
 GCC="gcc-4.7-2012.09"
@@ -345,7 +347,7 @@ if [ ! -e ${PROGRESS}/${BINUTILS}.built ]; then
 	export LDFLAGS="-I${STATICLIBS}/lib"
 	./configure --prefix=${PREFIX} --target=${TARGET} \
 		--build=${BUILD} --host=${HOST} --disable-nls \
-        	"--with-pkgversion=${PKGVERSION}" --with-bugurl=${BUGURL} \
+        	"--with-pkgversion=${PKGVERSIONGNU}" --with-bugurl=${BUGURL} \
 		--with-sysroot=${PREFIX}/${TARGET} \
 		--without-zlib --disable-shared --enable-static \
         	--enable-poison-system-directories --disable-plugins || exit
