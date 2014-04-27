@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#
+# TO-DO: proper Makefile, LOL!
+#
+
 OS=LINUX
 #OS=WINDOWS
 #OS=MACOSX
@@ -163,17 +167,22 @@ if [ ! -e ${PROGRESS}/${GMP}.built ]; then
 	echo "   GMP"
 	echo "*********************************"
 	cd ${WORKD}
-	tar -xjf ${SOURCES}/${GMP}.tar.bz2
-	cd ${WORKD}/${GMP}
-	patch -p0 < ${SOURCES}/gmp-virtualbox9485.patch
-	patch -p0 < ${SOURCES}/gmp-tscanf-wine.patch
+	if [ ! -e ${WORKD}/${GMP} ] ; then
+		tar -xjf ${SOURCES}/${GMP}.tar.bz2
+		cd ${WORKD}/${GMP}
+		patch -p0 < ${SOURCES}/gmp-virtualbox9485.patch
+		patch -p0 < ${SOURCES}/gmp-tscanf-wine.patch
+	else
+		cd ${WORKD}/${GMP}
+		make clean || exit
+	fi
 	./configure --prefix=${STATICLIBS} --build=${BUILD} --host=${HOST} \
 		 --disable-shared --enable-cxx || exit
 	make ${PARALLEL} || exit
 	make ${PARALLEL} check || exit
 	make install || exit
 	touch ${PROGRESS}/${GMP}.built
-	rm -rf ${WORKD}/${GMP}
+#	rm -rf ${WORKD}/${GMP}
 	cd ${THISDIR}
 fi
 
@@ -182,8 +191,13 @@ if [ ! -e ${PROGRESS}/${MPFR}.built ]; then
 	echo "   MPFR"
 	echo "*********************************"
 	cd ${WORKD}
-	tar -xjf ${SOURCES}/${MPFR}.tar.bz2
-	cd ${WORKD}/${MPFR}
+	if [ ! -e ${WORKD}/${MPFR} ] ; then
+		tar -xjf ${SOURCES}/${MPFR}.tar.bz2
+		cd ${WORKD}/${MPFR}
+	else
+		cd ${WORKD}/${MPFR}
+		make clean || exit
+	fi	
 	./configure --prefix=${STATICLIBS} --target=${TARGET} \
 		--build=${BUILD} --host=${HOST} --disable-shared \
 		--disable-nls --with-gmp=${STATICLIBS} || exit
@@ -191,7 +205,7 @@ if [ ! -e ${PROGRESS}/${MPFR}.built ]; then
 	make ${PARALLEL} check || exit
 	make install || exit
 	touch ${PROGRESS}/${MPFR}.built
-	rm -rf ${WORKD}/${MPFR}
+#	rm -rf ${WORKD}/${MPFR}
 	cd ${THISDIR}
 fi
 
@@ -200,17 +214,23 @@ if [ ! -e ${PROGRESS}/${MPC}.built ]; then
 	echo "   MPC"
 	echo "*********************************"
 	cd ${WORKD}
-	tar -xjf ${SOURCES}/${MPC}.tar.bz2
-	cd ${WORKD}/${MPC}
+	if [ ! -e ${WORKD}/${MPC} ] ; then
+		tar -xjf ${SOURCES}/${MPC}.tar.bz2
+		cd ${WORKD}/${MPC}
+	else
+		cd ${WORKD}/${MPC}
+		make clean || exit
+	fi
 	./configure --prefix=${STATICLIBS} --target=${TARGET} \
 		--build=${BUILD} --host=${HOST} --disable-shared \
 		--disable-nls --with-gmp=${STATICLIBS} \
 		--with-mpfr=${STATICLIBS} || exit
+	
 	make ${PARALLEL} || exit
 	make ${PARALLEL} check || exit
 	make install || exit
 	touch ${PROGRESS}/${MPC}.built
-	rm -rf ${WORKD}/${MPC}
+#	rm -rf ${WORKD}/${MPC}
 	cd ${THISDIR}
 fi
 
@@ -219,8 +239,13 @@ if [ ! -e ${PROGRESS}/${PPL}.built ]; then
 	echo "   PPL"
 	echo "*********************************"
 	cd ${WORKD}
-	tar -xjf ${SOURCES}/${PPL}.tar.bz2
-	cd ${WORKD}/${PPL}
+	if [ ! -e ${WORKD}/${PPL} ] ; then
+		tar -xjf ${SOURCES}/${PPL}.tar.bz2
+		cd ${WORKD}/${PPL}
+	else
+		cd ${WORKD}/${PPL}
+		make clean || exit
+	fi
 	./configure --prefix=${STATICLIBS} --target=${TARGET} \
 		--build=${BUILD} --host=${HOST} --disable-shared \
 		--disable-nls --with-gmp=${STATICLIBS} --with-libgmp=${STATICLIBS} \
@@ -229,7 +254,7 @@ if [ ! -e ${PROGRESS}/${PPL}.built ]; then
 	make ${PARALLEL} || exit
 	make install || exit
 	touch ${PROGRESS}/${PPL}.built
-	rm -rf ${WORKD}/${PPL}
+#	rm -rf ${WORKD}/${PPL}
 	cd ${THISDIR}
 fi
 
@@ -238,9 +263,14 @@ if [ ! -e ${PROGRESS}/${CLOOG}.built ]; then
 	echo "   CLOOG"
 	echo "*********************************"
 	cd ${WORKD}
-	tar -xjf ${SOURCES}/${CLOOG}.tar.bz2
-	cd ${WORKD}/${CLOOG}
-	patch < ${SOURCES}/cloog-mac.patch
+	if [ ! -e ${WORKD}/${CLOOG} ] ; then
+		tar -xjf ${SOURCES}/${CLOOG}.tar.bz2
+		cd ${WORKD}/${CLOOG}
+		patch < ${SOURCES}/cloog-mac.patch
+	else
+		cd ${WORKD}/${CLOOG}
+		make clean || exit
+	fi
 	./configure --prefix=${STATICLIBS} --target=${TARGET} \
 		--build=${BUILD} --host=${HOST} --disable-shared \
 		--disable-nls --with-gmp=${STATICLIBS} --with-ppl=${STATICLIBS} \
@@ -249,7 +279,7 @@ if [ ! -e ${PROGRESS}/${CLOOG}.built ]; then
 	make ${PARALLEL} check || exit
 	make install || exit
 	touch ${PROGRESS}/${CLOOG}.built
-	rm -rf ${WORKD}/${CLOOG}
+#	rm -rf ${WORKD}/${CLOOG}
 	cd ${THISDIR}
 fi
 
@@ -258,15 +288,20 @@ if [ ! -e ${PROGRESS}/${LIBELF}.built ]; then
 	echo "   LIBELF"
 	echo "*********************************"
 	cd ${WORKD}
-	tar -xjf ${SOURCES}/${LIBELF}.tar.bz2
-	cd ${WORKD}/${LIBELF}
+	if [ ! -e ${WORKD}/${LIBELF} ] ; then
+		tar -xjf ${SOURCES}/${LIBELF}.tar.bz2
+		cd ${WORKD}/${LIBELF}
+	else
+		cd ${WORKD}/${LIBELF}
+		make clean || exit
+	fi
 	./configure --prefix=${STATICLIBS} --target=${TARGET} \
 		--build=${BUILD} --host=${HOST} --disable-shared \
 		--disable-nls || exit
 	make ${PARALLEL} || exit
 	make install || exit
 	touch ${PROGRESS}/${LIBELF}.built
-	rm -rf ${WORKD}/${LIBELF}
+#	rm -rf ${WORKD}/${LIBELF}
 	cd ${THISDIR}
 fi
 
@@ -276,15 +311,20 @@ if [ ! -e ${PROGRESS}/${EXPAT}.built ]; then
 	echo "*********************************"
 	rm -rf ${WORKD}/${EXPAT}
 	cd ${WORKD}
-	tar -xjf ${SOURCES}/${EXPAT}.tar.bz2
-	cd ${WORKD}/${EXPAT}
+	if [ ! -e ${WORKD}/${EXPAT} ] ; then
+		tar -xjf ${SOURCES}/${EXPAT}.tar.bz2
+		cd ${WORKD}/${EXPAT}
+	else
+		cd ${WORKD}/${EXPAT}
+		make clean || exit
+	fi
 	./configure --prefix=${STATICLIBS} --target=${TARGET} \
 		--build=${BUILD} --host=${HOST} --disable-shared \
 		--disable-nls || exit
 	make ${PARALLEL} || exit
 	make install || exit
 	touch ${PROGRESS}/${EXPAT}.built
-	rm -rf ${WORKD}/${EXPAT}
+#	rm -rf ${WORKD}/${EXPAT}
 	cd ${THISDIR}
 fi
 
@@ -340,9 +380,13 @@ if [ ! -e ${PROGRESS}/${BINUTILS}.built ]; then
 	echo "   BINUTILS"
 	echo "*********************************"
 	cd ${WORKD}
-	rm -rf ${WORKD}/${BINUTILS}
-	tar -xjf ${SOURCES}/${BINUTILS}.tar.bz2
-	cd ${WORKD}/${BINUTILS}
+	if [ ! -e ${WORKD}/${BINUTILS} ] ; then
+		tar -xjf ${SOURCES}/${BINUTILS}.tar.bz2
+		cd ${WORKD}/${BINUTILS}
+	else
+		cd ${WORKD}/${BINUTILS}
+		make clean || exit
+	fi
 	export CPPFLAGS="-I${STATICLIBS}/include"
 	export LDFLAGS="-I${STATICLIBS}/lib"
 	./configure --prefix=${PREFIX} --target=${TARGET} \
@@ -364,16 +408,22 @@ if [ ! -e ${PROGRESS}/${BINUTILS}.built ]; then
 		|| exit
 	export -n CPPFLAGS
 	export -n LDFLAGS
+
+	# Why?
 	rm -f ${OUTPUT}/lib/libiberty.a
+
 	cp ${WORKD}/${BINUTILS}/bfd/.libs/libbfd.a ${STATICLIBS}/lib
 	cp ${WORKD}/${BINUTILS}/bfd/bfd.h ${STATICLIBS}/include
 	cp ${WORKD}/${BINUTILS}/bfd/elf-bfd.h ${STATICLIBS}/include
 	cp ${WORKD}/${BINUTILS}/opcodes/.libs/libopcodes.a ${STATICLIBS}/lib
 	mkdir -p ${STATICLIBS}/testbin
 	cp ${WORKD}/${BINUTILS}/binutils/bfdtest1${EXTENSION} ${STATICLIBS}/testbin
+
+	# Why?
 	rm -f ${OUTPUT}/bin/${TARGET}-ld.bfd${EXTENSION}
 	rm -f ${OUTPUT}/bin/ld.bfd${EXTENSION}
 	rm -f ${OUTPUT}/${TARGET}/bin/ld.bfd${EXTENSION}
+
 	${STRIP} ${OUTPUT}/bin/arm-none-eabi-addr2line${EXTENSION}
 	${STRIP} ${OUTPUT}/bin/arm-none-eabi-ar${EXTENSION}
 	${STRIP} ${OUTPUT}/bin/arm-none-eabi-as${EXTENSION}
@@ -398,7 +448,7 @@ if [ ! -e ${PROGRESS}/${BINUTILS}.built ]; then
 	${STRIP} ${OUTPUT}/arm-none-eabi/bin/ranlib${EXTENSION}
 	${STRIP} ${OUTPUT}/arm-none-eabi/bin/strip${EXTENSION}
 	touch ${PROGRESS}/${BINUTILS}.built
-	#rm -rf ${WORKD}/${BINUTILS}
+#	rm -rf ${WORKD}/${BINUTILS}
 	cd ${THISDIR}
 fi
 
@@ -407,14 +457,16 @@ if [ ! -e ${PROGRESS}/${GCC}-extract.built ]; then
 	echo "   GCC Extract & Patch"
 	echo "*********************************"
 	cd ${WORKD}
-	rm -rf ${WORKD}/${GCC} ${WORKD}/gcc-first ${WORKD}/gcc-final
-	cd ${WORKD}
-	tar -xjf ${SOURCES}/${GCC}.tar.bz2
-	cp ${SOURCES}/t-cs-eabi-lite ${GCC}/gcc/config/arm
-	cd ${GCC}
-	patch -p0 < ${SOURCES}/gcc-multilib-bash.patch
-	patch -p0 < ${SOURCES}/gcc-4.7-2012.09-caddr_t.patch
-	touch ${PROGRESS}/${GCC}-extract.built
+	if [ ! -e ${WORKD}/${GCC} ] ; then
+		rm -rf ${WORKD}/gcc-first ${WORKD}/gcc-final
+		cd ${WORKD}
+		tar -xjf ${SOURCES}/${GCC}.tar.bz2
+		cp ${SOURCES}/t-cs-eabi-lite ${GCC}/gcc/config/arm
+		cd ${GCC}
+		patch -p0 < ${SOURCES}/gcc-multilib-bash.patch
+		patch -p0 < ${SOURCES}/gcc-4.7-2012.09-caddr_t.patch
+		touch ${PROGRESS}/${GCC}-extract.built
+	fi
 	cd ${THISDIR}
 fi
 
@@ -422,7 +474,6 @@ if [ ! -e ${PROGRESS}/${GCC}-boot.built -a $BUILD == $HOST ]; then
 	echo "*********************************"
 	echo "   GCC Bootstrap"
 	echo "*********************************"
-	rm -rf ${WORKD}/gcc-first
 	mkdir -p ${WORKD}/gcc-first
 	cd ${WORKD}/gcc-first
 	${WORKD}/${GCC}/configure --prefix=${PREFIX} --target=${TARGET} \
@@ -463,6 +514,7 @@ if [ ! -e ${PROGRESS}/${GCC}-boot.built -a $BUILD == $HOST ]; then
 		infodir=${OUTPUT}/share/doc/arm-arm-none-eabi/info \
 		mandir=${OUTPUT}/share/doc/arm-arm-none-eabi/man \
 		install || exit
+	# Why?
 	rm -f ${OUTPUT}/lib/libiberty.a
 	rmdir ${OUTPUT}/include
 	touch ${PROGRESS}/${GCC}-boot.built
@@ -474,11 +526,16 @@ if [ ! -e ${PROGRESS}/${NEWLIB}.built -a $BUILD == $HOST ]; then
 	echo "   Newlib"
 	echo "*********************************"
 	cd ${WORKD}
-	rm -rf ${WORKD}/${NEWLIB} ${WORKD}/newlib-build
-	tar -xjf ${SOURCES}/${NEWLIB}.tar.bz2
+	#rm -rf ${WORKD}/${NEWLIB}
+	if [ ! -e ${WORKD}/${NEWLIB} ] ; then
+		tar -xjf ${SOURCES}/${NEWLIB}.tar.bz2
+		cp ${SOURCES}/newlib-2012.09.isr-safe-mlock.c \
+			${WORKD}/${NEWLIB}/newlib/libc/stdlib
+	fi
+	rm -rf ${WORKD}/newlib-build
 	mkdir -p ${WORKD}/newlib-build
 	cd ${WORKD}/newlib-build
-	export CFLAGS_FOR_TARGET="-g -O2 -fno-unroll-loops"
+	export CFLAGS_FOR_TARGET="-g -O2 -fno-unroll-loops -D__ISR_SAFE_MALLOC__"
 	${WORKD}/${NEWLIB}/configure --prefix=${PREFIX} --target=${TARGET} \
 		--build=${BUILD} --host=${HOST} \
 		--enable-newlib-io-long-long \
@@ -670,7 +727,4 @@ should not be placed on your PATH.  Instead, you should use the
 executables in ../../bin/ and place that directory on your PATH.
 EOF0
 echo "Build Completed"
-
-
-
 
