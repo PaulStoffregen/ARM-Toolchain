@@ -535,7 +535,8 @@ if [ ! -e ${PROGRESS}/${NEWLIB}.built -a $BUILD == $HOST ]; then
 	rm -rf ${WORKD}/newlib-build
 	mkdir -p ${WORKD}/newlib-build
 	cd ${WORKD}/newlib-build
-	export CFLAGS_FOR_TARGET="-g -O2 -fno-unroll-loops -D__ISR_SAFE_MALLOC__"
+	export CFLAGS_FOR_TARGET="-g -O2 -fno-unroll-loops"
+#	export CFLAGS_FOR_TARGET="-g -O2 -fno-unroll-loops -D__ISR_SAFE_MALLOC__"
 	${WORKD}/${NEWLIB}/configure --prefix=${PREFIX} --target=${TARGET} \
 		--build=${BUILD} --host=${HOST} \
 		--enable-newlib-io-long-long \
