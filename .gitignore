@@ -6,3 +6,5 @@ workdir/
 codebench.sh
 win.sh
 /*.zip
+/nbproject
+*~
